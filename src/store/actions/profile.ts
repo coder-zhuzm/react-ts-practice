@@ -9,18 +9,6 @@ import {
 } from "@/typings/user";
 export const validateAction = async () => {
   let result: any = await validate();
-  if (result.success) {
-    Toast.show({
-      icon: "success",
-      content: "已登录",
-    });
-  } else {
-    // Toast.show({
-    //   icon: "fail",
-    //   content: '未登录',
-    // });
-    console.log("未登录"); //暂无操作
-  }
   return {
     type: TYPES.VALIDATE,
     payload: result,
@@ -77,5 +65,11 @@ export const logoutAction = () => {
   });
   return {
     type: TYPES.LOGOUT,
+  };
+};
+export const changeAvatarAction = (avatar: string) => {
+  return {
+    type: TYPES.CHANGE_AVATAR,
+    payload: avatar,
   };
 };

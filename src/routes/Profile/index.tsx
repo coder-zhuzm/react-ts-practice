@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { validateAction, logoutAction } from "../../store/actions/profile";
+import { validateAction, logoutAction, changeAvatarAction } from "../../store/actions/profile";
 import LOGIN_TYPES from "../../typings/login-types";
-import { Descriptions, Alert } from "antd";
+import { Descriptions, Alert, Upload, message } from "antd";
 import { Button } from 'antd-mobile'
 import NavHeader from "../../components/NavHeader";
 import "./index.less";
@@ -12,18 +12,41 @@ import { useNavigate } from "react-router";
 function Profile(props: any) {
   const dispatch = useDispatch()
   const history = useNavigate();
-
   const state = useSelector((state: any) => ({
     loginState: state.profile.loginState,
     user: state.profile.user,
     error: state.profile.error,
   }))
+  const [loading, setLoading] = useState(false);
   const [element, setElement] = useState<any>()
   const { loginState, user, error } = state
   useEffect(() => {
     dispatch(validateAction())
   }, [dispatch])
-
+  function beforeUpload(file: any) {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      message.error("你只能上传JPG/PNG 文件!");
+    }
+    const isLessThan2M = file.size / 1024 / 1024 < 2;
+    if (!isLessThan2M) {
+      message.error("图片必须小于2MB!");
+    }
+    return isJpgOrPng && isLessThan2M;
+  }
+  const handleChange = (info: any) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+    } else if (info.file.status === "done") {
+      let { success, data, message } = info.file.response;
+      if (success) {
+        setLoading(false);
+        dispatch(changeAvatarAction(data))
+      } else {
+        message.error(message);
+      }
+    }
+  }
   useEffect(() => {
     if (loginState === LOGIN_TYPES.UN_VALIDATE) {
       //如果未验证则内容为null
@@ -35,6 +58,29 @@ function Profile(props: any) {
           <Descriptions title="当前登录用户">
             <Descriptions.Item label="用户名">{user?.username}</Descriptions.Item>
             <Descriptions.Item label="邮箱">{user?.email}</Descriptions.Item>
+            <Descriptions.Item label="头像">
+              <Upload
+                name="avatar"
+                listType="picture-card"
+                className="avatar-uploader"
+                showUploadList={false}
+                action="http://42.192.154.122:8001/user/uploadAvatar"
+                beforeUpload={beforeUpload}
+                data={{ userId: state.user._id }}
+                onChange={handleChange}
+              >
+                {state.user.avatar ? (
+                  <img
+                    src={state.user.avatar}
+                    alt="avatar"
+                    crossOrigin='anonymous' //解决跨域问题
+                    style={{ width: "100%" }}
+                  />
+                ) : (
+                  '上传按钮'
+                )}
+              </Upload>
+            </Descriptions.Item>
           </Descriptions>
           <Button color={"primary"} onClick={async () => {
             //注销

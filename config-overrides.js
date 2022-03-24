@@ -2,18 +2,35 @@ const {
   override,
   addWebpackAlias,
   addLessLoader,
-  // fixBabelImports,
+  addWebpackModuleRule,
+  adjustStyleLoaders
 } = require("customize-cra");
 const rewirePostcss = require("react-app-rewire-postcss");
+
 const path = require("path");
 module.exports = override(
-  // fixBabelImports("import", {
-  //   libraryName: "antd-mobile",
-  //   style: "css",
-  // }),
   addWebpackAlias({
     //配置别名
     "@": path.resolve(__dirname, "src"),
+  }),
+  addWebpackModuleRule(
+    {
+      test: /\.(jpg|png|gif|svg|jpeg)$/,
+      use: ["url-loader"],
+    }
+  ),
+  adjustStyleLoaders(({ use: [ , css, postcss, resolve, processor ] }) => {
+    css.options.sourceMap = true;         // css-loader
+    postcss.options.sourceMap = true;     // postcss-loader
+    // when enable pre-processor,
+    // resolve-url-loader will be enabled too
+    if (resolve) {
+      resolve.options.sourceMap = true;   // resolve-url-loader
+    }
+    // pre-processor
+    if (processor && processor.loader.includes('less-loader')) {
+      processor.options.sourceMap = true; // less-loader
+    }
   }),
   addLessLoader({
     lessOptions: {
@@ -23,9 +40,10 @@ module.exports = override(
       cssLoaderOptions: {
         modules: { localIdentName: "[name]_[local]_[hash:base64:5]" },
       }, // .less file used css-loader option, not all CSS file.
+      sourceMap: true,
     },
   }),
-  (config, env,) => {
+  (config, env) => {
     rewirePostcss(config, {
       // postcss 配置
       plugins: (loader) => [
@@ -56,7 +74,8 @@ module.exports = override(
           utf8: false,
         }),
         require("postcss-viewport-units")({
-          filterRule: rule => rule.nodes.findIndex(i => i.prop === 'content') === -1 // 过滤伪类content使用
+          filterRule: (rule) =>
+            rule.nodes.findIndex((i) => i.prop === "content") === -1, // 过滤伪类content使用
         }),
         require("cssnano")({
           preset: "advanced",

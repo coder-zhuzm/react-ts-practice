@@ -33,7 +33,21 @@ export default function profile(
           error: action.payload, //错误对象赋值
         };
       }
-      
+    case TYPES.LOGOUT:
+      return {
+        ...state,
+        loginState: LOGIN_TYPES.UN_VALIDATE,
+        user: null,
+        error: null,
+      };
+    case TYPES.CHANGE_AVATAR:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          avatar: action.payload,
+        },
+      };
     default:
       return state;
   }

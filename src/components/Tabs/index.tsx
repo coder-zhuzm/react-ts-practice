@@ -15,8 +15,8 @@ export default memo(function Tabs() {
         </i>
         <span>首页</span>
       </NavLink>
-      <NavLink to="/Mine">
-        <i>
+      <NavLink to="/Cart">
+        <i className='cart'>
           <GiftOutline />
         </i>
         <span>购物车</span>

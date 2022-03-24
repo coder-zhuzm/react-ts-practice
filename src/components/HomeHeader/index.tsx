@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { UnorderedListOutline } from 'antd-mobile-icons'
 
 import { Transition } from 'react-transition-group';
-import logo from '@/assets/images/logo.png';
+// import logo from '@/assets/images/logo.png';  // ios base 64过长无法展示
 //ts 不认识图片，只认识js jsx tsx
 //let logo = require('../../../../assets/images/logo.png');
 //如果是用require加载的话，返回值的default属性才是那个图片地址
@@ -24,15 +24,15 @@ interface TransitionStyles {
 const transitionStyles: TransitionStyles = {
   entering: { opacity: 1 },
   entered: { opacity: 1 },
-  exiting: { opacity: 0 },
-  exited: { opacity: 0 },
+  exiting: { opacity: 0, },
+  exited: { opacity: 0, },
 };
 
 
 interface Props {
   currentCategory: string;//当前选中的分类 此数据会放在redux仓库中
   setCurrentCategory: (currentCategory: string) => any;// 改变仓库中的分类
-  // refreshLessons: any;
+  refreshLessons: any;
 }
 function HomeHeader(props: Props) {
   let [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -40,18 +40,23 @@ function HomeHeader(props: Props) {
     let target: HTMLUListElement = event.target as HTMLUListElement;
     let category: any = target.dataset.category;
     props.setCurrentCategory(category);
-    // props.refreshLessons();
+    props.refreshLessons();
     setIsMenuVisible(false);
+    
   }
   return (
-    <header className="home-header">
+    <header className="home-header" style={{
+      zIndex: !isMenuVisible ? '0' : '999',
+    }}>
       <div className="logo-header">
-        <img src={logo}  alt='logo'/>
+        <img src={'http://42.192.154.122:8001/uploads/1648103206642.png'}
+          crossOrigin='anonymous' //解决跨域问题
+          alt='logo' />
         <i>
           <UnorderedListOutline onClick={() => setIsMenuVisible(!isMenuVisible)} />
         </i>
       </div>
-      <Transition in={isMenuVisible} timeout={duration}>
+      <Transition in={isMenuVisible} timeout={duration} >
         {
           (state: keyof TransitionStyles) => (
             <ul
