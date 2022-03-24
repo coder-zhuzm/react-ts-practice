@@ -6,7 +6,7 @@ export default function request(option: any) {
     const instance = axios.create({
       baseURL:
         process.env.NODE_ENV === "production"
-          ? "http://42.192.154.122:8001/"
+          ? "https://zfktapi.zhuzm.icu/"
           : "http://42.192.154.122:8001/",
       timeout: 10000,
     });
