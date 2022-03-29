@@ -1,8 +1,5 @@
 ## 项目地址
 
-[演示地址1](https://react-ts-practice.vercel.app/)
-[演示地址2](http://zfkt.zhuzm.icu/)
-
 后端接口地址：https://github.com/coder-zhuzm/zf-server
 ## 项目介绍
 系统学习和掌握React全家桶的实战应用，功能包括： 
